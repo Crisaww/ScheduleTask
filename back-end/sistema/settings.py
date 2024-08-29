@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
+from pathlib import Path  # Corregido
+from decouple import config
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +27,11 @@ SECRET_KEY = 'django-insecure-xzp3++r*g#n!euhplf!w3s_*2h-7^o-#c#(k5r6f1=%z)=&3=_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5502",
+    "http://10.192.66.56:5502"# Reemplaza con el origen de tu frontend
+]
 
 # Application definition
 
@@ -39,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders', 
     'rest_framework', 
-    'Scheduler'
+    'Scheduler',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -71,6 +77,15 @@ TEMPLATES = [
     },
 ]
 
+# Configuración de email
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'tuvoozsoporte@gmail.com'
+EMAIL_HOST_PASSWORD = config('USER_MAIL_PASSWORD')
+EMAIL_USE_TLS = True
+
 WSGI_APPLICATION = 'sistema.wsgi.application'
 
 
@@ -78,9 +93,18 @@ WSGI_APPLICATION = 'sistema.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+    
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'taskdb',
+        'USER': 'root',
+        'PASSWORD': 'root123',# se debe cambiar esto de acuerdo a la DB que van a utilizar
+        'HOST': 'localhost',  # o la dirección IP de tu servidor MySQL
+        'PORT': '3306',       
     }
 }
 
@@ -102,6 +126,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'Scheduler.UsuarioSobreescrito'
+
 
 
 # Internationalization
@@ -125,6 +152,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Creo el servidor de correo por consola
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
