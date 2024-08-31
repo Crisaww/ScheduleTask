@@ -52,8 +52,7 @@ def registro(request):
                 from_email = settings.EMAIL_HOST_USER
                 to = request.data.get('email')
                 text_content = 'Gracias por registrarte en Website.'
-                html_content = render_to_string('correoRegistro.html', {'username': user.username, 'message': text_content})
-
+                html_content = render_to_string('correoRegistro.html', {'subject': subject, 'message': text_content})
 
                 email = EmailMultiAlternatives(subject, text_content, from_email, [to])
                 email.attach_alternative(html_content, "text/html")
